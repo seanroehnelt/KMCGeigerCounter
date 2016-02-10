@@ -15,11 +15,13 @@
 // that doesn't work for all options of the "C Language Dialect" build setting.
 // https://github.com/kconner/KMCGeigerCounter/issues/3
 #define kHardwareFramesPerSecond 60
+#define kNumberOfSeconds 5
+#define kNumberOfFrameTimes (kHardwareFramesPerSecond * kNumberOfSeconds)
 
 static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecond;
 
 @interface KMCGeigerCounter () {
-    CFTimeInterval _lastSecondOfFrameTimes[kHardwareFramesPerSecond];
+    CFTimeInterval _lastSecondOfFrameTimes[kNumberOfFrameTimes];
 }
 
 @property (nonatomic, readwrite, getter = isRunning) BOOL running;
@@ -53,19 +55,19 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
 
 - (CFTimeInterval)lastFrameTime
 {
-    return _lastSecondOfFrameTimes[self.frameNumber % kHardwareFramesPerSecond];
+    return _lastSecondOfFrameTimes[self.frameNumber % kNumberOfFrameTimes];
 }
 
 - (void)recordFrameTime:(CFTimeInterval)frameTime
 {
     ++self.frameNumber;
-    _lastSecondOfFrameTimes[self.frameNumber % kHardwareFramesPerSecond] = frameTime;
+    _lastSecondOfFrameTimes[self.frameNumber % kNumberOfFrameTimes] = frameTime;
 }
 
 - (void)clearLastSecondOfFrameTimes
 {
     CFTimeInterval initialFrameTime = CACurrentMediaTime();
-    for (NSInteger i = 0; i < kHardwareFramesPerSecond; ++i) {
+    for (NSInteger i = 0; i < kNumberOfFrameTimes; ++i) {
         _lastSecondOfFrameTimes[i] = initialFrameTime;
     }
     self.frameNumber = 0;
@@ -73,7 +75,7 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
 
 - (void)updateMeterLabel
 {
-    NSInteger droppedFrameCount = self.droppedFrameCountInLastSecond;
+    NSInteger droppedFrameCount = self.droppedFrameCountInLastSeconds;
     NSInteger drawnFrameCount = self.drawnFrameCountInLastSecond;
 
     NSString *droppedString;
@@ -286,12 +288,12 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
     self.window.windowLevel = windowLevel;
 }
 
-- (NSInteger)droppedFrameCountInLastSecond
+- (NSInteger)droppedFrameCountInLastSeconds
 {
     NSInteger droppedFrameCount = 0;
 
     CFTimeInterval lastFrameTime = CACurrentMediaTime() - kNormalFrameDuration;
-    for (NSInteger i = 0; i < kHardwareFramesPerSecond; ++i) {
+    for (NSInteger i = 0; i < kNumberOfFrameTimes; ++i) {
         if (1.0 <= lastFrameTime - _lastSecondOfFrameTimes[i]) {
             ++droppedFrameCount;
         }
@@ -302,11 +304,11 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
 
 - (NSInteger)drawnFrameCountInLastSecond
 {
-    if (!self.running || self.frameNumber < kHardwareFramesPerSecond) {
+    if (!self.running || self.frameNumber < kNumberOfFrameTimes) {
         return -1;
     }
 
-    return kHardwareFramesPerSecond - self.droppedFrameCountInLastSecond;
+    return kNumberOfFrameTimes - self.droppedFrameCountInLastSeconds;
 }
 
 @end
