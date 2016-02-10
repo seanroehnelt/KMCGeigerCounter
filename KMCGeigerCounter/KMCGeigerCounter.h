@@ -24,8 +24,8 @@ typedef NS_ENUM(NSUInteger, KMCGeigerCounterPosition) {
 @property (nonatomic, assign) KMCGeigerCounterPosition position;
 
 @property (nonatomic, readonly, getter = isRunning) BOOL running;
-@property (nonatomic, readonly) NSInteger droppedFrameCountInLastSecond;
-@property (nonatomic, readonly) NSInteger drawnFrameCountInLastSecond; // -1 until one second of frames have been collected
+@property (nonatomic, readonly) NSInteger droppedFrameCountInLastSeconds;
+@property (nonatomic, readonly) NSInteger drawnFrameCountInLastSeconds; // -1 until one second of frames have been collected
 
 + (instancetype)sharedGeigerCounter;
 

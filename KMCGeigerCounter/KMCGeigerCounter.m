@@ -76,7 +76,7 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
 - (void)updateMeterLabel
 {
     NSInteger droppedFrameCount = self.droppedFrameCountInLastSeconds;
-    NSInteger drawnFrameCount = self.drawnFrameCountInLastSecond;
+    NSInteger drawnFrameCount = self.drawnFrameCountInLastSeconds;
 
     NSString *droppedString;
     NSString *drawnString;
@@ -302,7 +302,7 @@ static NSTimeInterval const kNormalFrameDuration = 1.0 / kHardwareFramesPerSecon
     return droppedFrameCount;
 }
 
-- (NSInteger)drawnFrameCountInLastSecond
+- (NSInteger)drawnFrameCountInLastSeconds
 {
     if (!self.running || self.frameNumber < kNumberOfFrameTimes) {
         return -1;
